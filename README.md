@@ -1,79 +1,110 @@
-# Lab 2: Simple Shell and Utilities
+# Simple Shell and Utilities
 
-This project implements a simple Unix-like shell (`myshell`), a pipe demonstration program (`mypipe`), and a signal-handling loop program (`looper`). It is written in C and is intended for educational purposes, demonstrating process management, piping, signal handling, and command parsing.
+This project implements a Unix-like shell and a set of small helper programs for testing process management, signals, redirection, pipes, and shell history. It is written in C and is intended as a compact, reusable shell project.
 
 ## Components
 
-### myshell
-A custom shell that supports:
-- Running external commands
-- Input/output redirection
-- Built-in commands:
-  - `cd <dir>`: Change directory
-  - `quit`: Exit the shell
-  - Signal management commands:
-    - `stop <pid>`: Send SIGSTOP to a process
-    - `wakeup <pid>`: Send SIGCONT to a process
-    - `ice <pid>`: Send SIGINT to a process
-    - `nuke <pid>`: Send SIGKILL to a process group
-- Foreground/background execution (blocking/non-blocking)
-- Debug mode (`-d` flag): Prints debug information
+### `myshell`
+The main shell program. It supports:
+- External commands via `fork()` and `execvp()`
+- Foreground and background execution
+- Input and output redirection
+- A built-in `cd <dir>` command
+- A built-in `quit` command
+- Signal commands:
+  - `stop <pid>` sends `SIGSTOP`
+  - `wakeup <pid>` sends `SIGCONT`
+  - `ice <pid>` sends `SIGINT`
+  - `nuke <pid>` sends `SIGKILL` to a process group
+- A process list command:
+  - `procs`
+- History support:
+  - `history`
+  - `!!`
+  - `!n`
+- One-pipe command execution between two processes
+- Debug mode with the `-d` flag
 
-### mypipe
-A simple demonstration of using pipes and fork:
-- Parent process writes a message to a pipe
-- Child process reads the message and prints it
-- Usage: `./mypipe <message>`
+### `mypipeline`
+A standalone pipe demonstration program. It shows how to create a pipe between two child processes and runs the equivalent of:
+- `ps -xl | grep 5`
 
-### looper
-A program that installs custom signal handlers for SIGINT, SIGTSTP, and SIGCONT, and prints a message when a signal is received. It runs an infinite loop and is useful for testing signal delivery from the shell.
+### `looper`
+A helper program for testing signal handling. It installs custom handlers for `SIGINT`, `SIGTSTP`, and `SIGCONT`, prints which signal was received, and then lets the default signal action take effect.
 
-### lineParser.c / lineParser.h
-Implements command line parsing for the shell, supporting argument splitting, redirection, and command chaining.
+### `lineParser.c` / `lineParser.h`
+Command-line parsing helpers used by `myshell` for argument splitting, redirection, blocking/background execution, and pipe chaining.
 
 ## Building
 
-To build all programs, run:
+Build the main executables with:
 
+```bash
+make myshell
+make mypipeline
+make looper
 ```
+
+Or build everything with:
+
+```bash
 make
 ```
 
-This will produce the following executables:
-- `myshell`
-- `mypipe`
-- `looper`
+To remove generated binaries:
 
-To clean up compiled binaries:
-
-```
+```bash
 make clean
 ```
 
 ## Usage
 
-- Start the shell:
-  ```
-  ./myshell
-  ```
-- Run the pipe demo:
-  ```
-  ./mypipe "Hello, world!"
-  ```
-- Run the looper:
-  ```
-  ./looper
-  ```
+Start the shell:
+
+```bash
+./myshell
+```
+
+Run the shell in debug mode:
+
+```bash
+./myshell -d
+```
+
+Run the pipe demo:
+
+```bash
+./mypipeline
+```
+
+Run the signal-test helper:
+
+```bash
+./looper
+```
+
+Example shell commands:
+
+```bash
+ls
+ls &
+cat < input.txt
+echo hello > output.txt
+ls | wc -l
+history
+!!
+!3
+procs
+stop 12345
+```
 
 ## Files
-- `myShell.c`: Main shell implementation
-- `myPipe.c`: Pipe demo program
-- `looper.c`: Signal handling loop
-- `lineParser.c`, `lineParser.h`: Command line parser
-- `Makefile`: Build instructions
-- `test_input.txt`: Example input for testing
+- `myShell.c`: Shell implementation
+- `myPipeLine.c`: Standalone pipe demonstration program
+- `looper.c`: Signal-handling test program
+- `lineParser.c`, `lineParser.h`: Parsing helpers
+- `Makefile`: Build rules for the executables
 
 ## Author
 Gefen Slodownik
----
 
